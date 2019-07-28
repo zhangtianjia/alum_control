@@ -24,11 +24,12 @@ class serialport_write():
             raise
         self.motor_cmd = 0
         self.loop = rospy.Rate(20)
-        data = struct.pack('4B1H2B', 00, 04, 01, 01, 200, 13, 10)
+        data = struct.pack('4B1H2B', 01, 04, 01, 01, 00, 13, 10)
         rospy.loginfo(binascii.b2a_hex(data))
         self.serialcon.write(data)
         rospy.wait_for_message('/actuators/A1', Float32)
         rospy.Subscriber('/actuators/A1', Float32, self.send1, queue_size=5)
+        rospy.Subscriber('/actuators/A2', Float32, self.send2, queue_size=5)
 
     def send1(self, motor):
         print("A1 called")
@@ -50,6 +51,28 @@ class serialport_write():
             rospy.loginfo("send successful")
         except:
                pass
+        self.loop.sleep()
+
+    def send2(self, motor):
+        print("A2 called")
+        self.motor_cmd = int(motor.data * 100)
+        rospy.loginfo(self.motor_cmd)
+        if self.motor_cmd >= 0:
+            motor_sign = 01
+        else:
+            motor_sign = 0
+            #       if self.motor_cmd<=3000 & self.motor_cmd>=-3000:
+            #           x = struct.pack('4B1H2B', 00, 04, 01, 00, 00, 13, 10)
+            #       else:
+            #           x = struct.pack('4B1H2B', 00, 04, 01, motor_sign, 00, 13, 10)
+        data = struct.pack('4B1H2B', 01, 04, 02, motor_sign, abs(self.motor_cmd), 13, 10)
+        rospy.loginfo(binascii.b2a_hex(data))
+        try:
+                #            self.serialcon.write(x)
+            self.serialcon.write(data)
+            rospy.loginfo("send successful")
+        except:
+                pass
         self.loop.sleep()
     def shutdown(self):
         rospy.loginfo("Stopping")
