@@ -12,6 +12,23 @@ std_msgs::Float32 make_std_float32( float data ){
     return rst;
 }
 
+float remap_control( float val, float start = 0.3 ){
+
+    float v = std::abs(val);
+
+    float sgn = val > 0 ? 1 : -1;
+
+    if ( v > start ) {
+        v = (v-start)/(1-start);
+    }
+    else {
+        v = 0;
+    }
+
+    return sgn * v;
+
+}
+
 struct joystick_interpreter_t {
 
     ros::NodeHandle nh;
@@ -26,8 +43,8 @@ struct joystick_interpreter_t {
     }
 
     void joy_callback( sensor_msgs::JoyConstPtr const & msg ){
-        pub_A1.publish(make_std_float32(msg->axes.at(0)));
-        pub_A2.publish(make_std_float32(msg->axes.at(1)));
+        pub_A1.publish(make_std_float32(remap_control(msg->axes.at(0))));
+        pub_A2.publish(make_std_float32(remap_control(msg->axes.at(1))));
     }
 
 };
