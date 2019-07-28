@@ -17,9 +17,9 @@ rospy.init_node("pub_example")
 rospy.on_shutdown(shutdown)
 pub=rospy.Publisher("motor_pid",Motor_cmd,queue_size=5)
 motor=Motor_cmd()
-motor.motor1_control=-0.2356
-motor.motor2_control=-0.2356
-motor.motor3_control=-0.2356
+motor.motor1_control=0.2356
+motor.motor2_control=0.2356
+motor.motor3_control=0.2356
 while not rospy.is_shutdown():
     pub.publish(motor)
     rospy.sleep(1)

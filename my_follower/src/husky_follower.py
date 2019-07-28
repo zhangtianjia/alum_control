@@ -39,7 +39,7 @@ class OutAndBack():
         self.cmd_vel.publish(Twist())
         rospy.sleep(1)
     def move_linear(self, linear_speed, goal_distance, rate):
-	r = rospy.Rate(rate)
+        r = rospy.Rate(rate)
             # Initialize the movement command
         move_cmd = Twist()
         # How long should it take us to get there?
@@ -58,7 +58,7 @@ class OutAndBack():
         OutAndBack_Object.cmd_vel.publish(move_cmd)
         rospy.sleep(1)
     def move_angular(self, angular_speed,angular_distance, rate):
-	r = rospy.Rate(rate)
+        r = rospy.Rate(rate)
             # Initialize the movement command
         move_cmd = Twist()
         # How long should it take us to get there?
@@ -86,14 +86,15 @@ rospy.init_node('out_and_back', anonymous=False)
 rospy.on_shutdown(OutAndBack_Object.shutdown)
         
         # How fast will we update the robot's movement?
-rate = 50
+rate = 10
         
 linear_speed=0.2
 angular_speed=-0.15
-goal_distance_1=1
+goal_distance_1=4
 angular_distance=-pi/2
 OutAndBack_Object.move_linear(linear_speed, goal_distance_1, rate)
 OutAndBack_Object.move_angular(angular_speed, angular_distance, rate)
+OutAndBack_Object.move_linear(linear_speed, goal_distance_1, rate)
 #OutAndBack_Object.move_linear(linear_speed, goal_distance_1, rate)
 #OutAndBack_Object.move_angular(angular_speed, angular_distance, rate)
 #OutAndBack_Object.move_linear(linear_speed, goal_distance_1, rate)
