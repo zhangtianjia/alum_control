@@ -6,25 +6,31 @@
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/Float32.h>
 
+std_msgs::Float32 make_std_float32( float data ){
+    std_msgs::Float32 rst;
+    rst.data = data;
+    return rst;
+}
+
 struct joystick_interpreter_t {
 
     ros::NodeHandle nh;
 
     ros::Publisher pub_A1;
 
+    ros::Publisher pub_A2;
+
     joystick_interpreter_t(){
         pub_A1 = nh.advertise<std_msgs::Float32>("/actuators/A1",1);
+        pub_A2 = nh.advertise<std_msgs::Float32>("/actuators/A2",1);
     }
 
     void joy_callback( sensor_msgs::JoyConstPtr const & msg ){
-        std_msgs::Float32 out;
-        out.data = msg->axes.front();
-        pub_A1.publish(out);
+        pub_A1.publish(make_std_float32(msg->axes.at(0)));
+        pub_A2.publish(make_std_float32(msg->axes.at(1)));
     }
 
 };
-
-
 
 int main( int argc, char** argv ) {
 
