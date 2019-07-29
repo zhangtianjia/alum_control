@@ -3,6 +3,8 @@
 
     <node name="joystick_forward_node" pkg="ros_serial_control" type="joystick_forward_node" />
 
-    <node name="joystick_node" pkg="joy" type="joy_node" />
+    <node name="joystick_node" pkg="joy" type="joy_node">
+        <param name="~autorepeat_rate" type="double" value="20" />
+    </node>
   
 </launch>

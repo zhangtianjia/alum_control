@@ -29,6 +29,11 @@ float remap_control( float val, float start = 0.3 ){
 
 }
 
+enum class control_mode_e {
+    gun_xy,
+    gun_z,
+};
+
 struct joystick_interpreter_t {
 
     ros::NodeHandle nh;
@@ -37,14 +42,46 @@ struct joystick_interpreter_t {
 
     ros::Publisher pub_A2;
 
+    ros::Publisher pub_A3;
+
     joystick_interpreter_t(){
         pub_A1 = nh.advertise<std_msgs::Float32>("/actuators/A1",1);
         pub_A2 = nh.advertise<std_msgs::Float32>("/actuators/A2",1);
+        pub_A3 = nh.advertise<std_msgs::Float32>("/actuators/A3",1);
     }
 
     void joy_callback( sensor_msgs::JoyConstPtr const & msg ){
-        pub_A1.publish(make_std_float32(remap_control(msg->axes.at(0))));
-        pub_A2.publish(make_std_float32(remap_control(msg->axes.at(3))));
+
+        control_mode_e mode = control_mode_e::gun_xy;
+
+        if ( msg->buttons.at(0) > 0 ) {
+            mode = control_mode_e::gun_z;
+        }
+        else {
+            mode = control_mode_e::gun_xy;
+        }
+
+        //////////////////////
+
+        if ( mode == control_mode_e::gun_xy ) {
+            pub_A1.publish(make_std_float32(remap_control(msg->axes.at(0))));
+            pub_A2.publish(make_std_float32(remap_control(msg->axes.at(3))));
+        }
+        else {
+            pub_A1.publish(make_std_float32(remap_control(0)));
+            pub_A2.publish(make_std_float32(remap_control(0)));
+        }
+
+        /////////////////////
+
+        if ( mode == control_mode_e::gun_z ) {
+            pub_A3.publish(make_std_float32(remap_control(msg->axes.at(0))));
+        }
+        else {
+            pub_A3.publish(make_std_float32(remap_control(0)));
+        }
+
+
     }
 
 };
