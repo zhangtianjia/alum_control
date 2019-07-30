@@ -25,6 +25,7 @@
 import rospy
 from geometry_msgs.msg import Twist
 from math import pi
+import time
 
 class OutAndBack():
     def __init__(self):
@@ -92,9 +93,16 @@ linear_speed=0.2
 angular_speed=-0.15
 goal_distance_1=4
 angular_distance=-pi/2
-OutAndBack_Object.move_linear(linear_speed, goal_distance_1, rate)
-OutAndBack_Object.move_angular(angular_speed, angular_distance, rate)
-OutAndBack_Object.move_linear(linear_speed, goal_distance_1, rate)
+
+OutAndBack_Object.move_linear(0.2, 1, 10)
+time.sleep(30)
+OutAndBack_Object.move_linear(-0.2, -1, 10)
+OutAndBack_Object.move_angular(-0.15, -pi/2, 10)
+OutAndBack_Object.move_linear(0.2, 2, 10)
+OutAndBack_Object.move_angular(0.15, pi/2, 10)
+OutAndBack_Object.move_linear(0.2, 1, 10)
+
+
 #OutAndBack_Object.move_linear(linear_speed, goal_distance_1, rate)
 #OutAndBack_Object.move_angular(angular_speed, angular_distance, rate)
 #OutAndBack_Object.move_linear(linear_speed, goal_distance_1, rate)
