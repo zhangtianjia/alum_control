@@ -5,9 +5,16 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Bool.h>
 
 std_msgs::Float32 make_std_float32( float data ){
     std_msgs::Float32 rst;
+    rst.data = data;
+    return rst;
+}
+
+std_msgs::Bool make_std_bool( bool data ){
+    std_msgs::Bool rst;
     rst.data = data;
     return rst;
 }
@@ -44,10 +51,13 @@ struct joystick_interpreter_t {
 
     ros::Publisher pub_A3;
 
+    ros::Publisher pub_A4;
+
     joystick_interpreter_t(){
         pub_A1 = nh.advertise<std_msgs::Float32>("/actuators/A1",1);
         pub_A2 = nh.advertise<std_msgs::Float32>("/actuators/A2",1);
         pub_A3 = nh.advertise<std_msgs::Float32>("/actuators/A3",1);
+        pub_A4 = nh.advertise<std_msgs::Bool>("/actuators/A4",1);
     }
 
     void joy_callback( sensor_msgs::JoyConstPtr const & msg ){
@@ -81,6 +91,9 @@ struct joystick_interpreter_t {
             pub_A3.publish(make_std_float32(remap_control(0)));
         }
 
+        //////////////////////
+
+        pub_A4.publish(make_std_bool(msg->buttons.at(2) > 0));
 
     }
 
