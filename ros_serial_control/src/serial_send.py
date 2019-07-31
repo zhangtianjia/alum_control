@@ -38,7 +38,7 @@ class AlumSerialInterface:
         rospy.loginfo(binascii.b2a_hex(data))
         try:
             self.serialcon.write(data)
-            rospy.loginfo("send successful")
+            #rospy.loginfo("send successful")
         except:
             print("serial send failed!")
             raise
@@ -48,7 +48,7 @@ class AlumSerialInterface:
         rospy.loginfo(binascii.b2a_hex(data))
         try:
             self.serialcon.write(data)
-            rospy.loginfo("send successful")
+            #rospy.loginfo("send successful")
         except:
             print("serial send failed!")
             raise
@@ -107,17 +107,17 @@ class AlumRosNode:
         if joy.buttons[3] > 0:
             self.stop_all()
             self.a3_step_up()
+            self.loop.sleep()
             return
         if joy.buttons[0] > 0:
             self.stop_all()
             self.a3_step_down()
+            self.loop.sleep()
             return
-
-        self.control_a2(joy.axes[0])
-        self.loop.sleep()
-        self.loop.sleep()
         self.control_a1(joy.axes[3])
         self.loop.sleep()
+        self.loop.sleep()
+        self.control_a2(joy.axes[0])
         self.loop.sleep()
 
     def a3_step_up(self):
