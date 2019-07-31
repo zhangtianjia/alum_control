@@ -102,6 +102,14 @@ class AlumRosNode:
         rospy.Subscriber('/joy', Joy, self.callback_joystick, queue_size=1)
 
     def callback_joystick(self, joy):
+        if joy.buttons[4] > 0 and joy.buttons[2] > 0:
+            self.stop_all()
+            self.a3_step_up_big()
+            self.loop.sleep()
+        if joy.buttons[4] > 0 and joy.buttons[1] > 0:
+            self.stop_all()
+            self.a3_step_down_big()
+            self.loop.sleep()
         if joy.buttons[3] > 0:
             self.stop_all()
             self.a3_step_up()
@@ -133,6 +141,30 @@ class AlumRosNode:
         cnt = 0
         while cnt < 2:
             self.control_a3(-0.6)
+            cnt = cnt+1
+            self.loop.sleep()
+        self.control_a3(0)
+        self.loop.sleep()
+        self.control_a3(0)
+        self.loop.sleep()
+        self.control_a3(0)
+
+    def a3_step_up_big(self):
+        cnt = 0
+        while cnt < 10:
+            self.control_a3(1)
+            cnt = cnt+1
+            self.loop.sleep()
+        self.control_a3(0)
+        self.loop.sleep()
+        self.control_a3(0)
+        self.loop.sleep()
+        self.control_a3(0)
+
+    def a3_step_down_big(self):
+        cnt = 0
+        while cnt < 10:
+            self.control_a3(-1)
             cnt = cnt+1
             self.loop.sleep()
         self.control_a3(0)
