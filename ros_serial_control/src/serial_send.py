@@ -104,17 +104,20 @@ class AlumRosNode:
         rospy.Subscriber('/joy', Joy, self.callback_joystick, queue_size=1)
 
     def callback_joystick(self, joy):
-        if joy.buttons[0] > 0:
+        if joy.buttons[3] > 0:
             self.stop_all()
             self.a3_step_up()
             return
-        if joy.buttons[3] > 0:
+        if joy.buttons[0] > 0:
             self.stop_all()
             self.a3_step_down()
             return
-        self.control_a1(joy.axes[0])
+
+        self.control_a2(joy.axes[1])
         self.loop.sleep()
-        self.control_a2(joy.axes[2])
+        self.loop.sleep()
+        self.control_a1(joy.axes[3])
+        self.loop.sleep()
         self.loop.sleep()
 
     def a3_step_up(self):
