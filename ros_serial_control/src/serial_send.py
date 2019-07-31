@@ -113,7 +113,7 @@ class AlumRosNode:
             self.a3_step_down()
             return
 
-        self.control_a2(joy.axes[1])
+        self.control_a2(joy.axes[0])
         self.loop.sleep()
         self.loop.sleep()
         self.control_a1(joy.axes[3])
