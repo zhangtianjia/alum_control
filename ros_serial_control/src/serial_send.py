@@ -28,8 +28,6 @@ class AlumSerialInterface:
         except:
             print("cant open")
             raise
-        self.motor_cmd = 0
-        self.loop = rospy.Rate(20)
         data = struct.pack('4B1H2B', 01, 04, 01, 01, 00, 13, 10)
         rospy.loginfo(binascii.b2a_hex(data))
 
@@ -58,7 +56,7 @@ class AlumSerialInterface:
         rospy.loginfo(binascii.b2a_hex(data))
         try:
             self.serialcon.write(data)
-            rospy.loginfo("send successful")
+            #rospy.loginfo("send successful")
         except:
             print("serial send failed!")
             raise
