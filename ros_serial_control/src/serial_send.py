@@ -98,7 +98,7 @@ class AlumRosNode:
     def __init__(self):
         rospy.init_node("serial_send")
         rospy.on_shutdown(self.shutdown)
-        self.loop = rospy.Rate(20)
+        self.loop = rospy.Rate(10)
         self.serial = AlumSerialInterface()
         self.stop_all()
         rospy.Subscriber('/joy', Joy, self.callback_joystick, queue_size=1)
@@ -114,42 +114,43 @@ class AlumRosNode:
             self.a3_step_down()
             self.loop.sleep()
             return
+        self.loop.sleep()
         self.control_a1(joy.axes[3])
         self.loop.sleep()
-        self.loop.sleep()
         self.control_a2(joy.axes[0])
-        self.loop.sleep()
 
     def a3_step_up(self):
         cnt = 0
-        while cnt < 5:
+        while cnt < 2:
             self.control_a3(0.6)
             cnt = cnt+1
             self.loop.sleep()
         self.control_a3(0)
         self.loop.sleep()
         self.control_a3(0)
+        self.loop.sleep()
         self.control_a3(0)
 
     def a3_step_down(self):
         cnt = 0
-        while cnt < 5:
+        while cnt < 2:
             self.control_a3(-0.6)
             cnt = cnt+1
             self.loop.sleep()
         self.control_a3(0)
         self.loop.sleep()
         self.control_a3(0)
+        self.loop.sleep()
         self.control_a3(0)
 
     def control_a1(self, val):
-        self.serial.send_A1(val*800)
+        self.serial.send_A1(int(val*800))
 
     def control_a2(self, val):
-        self.serial.send_A2(val*800)
+        self.serial.send_A2(int(val*800))
 
     def control_a3(self, val):
-        self.serial.send_A3(val*800)
+        self.serial.send_A3(int(val*800))
 
     def stop_all(self):
         self.control_a1(0)
