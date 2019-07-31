@@ -10,6 +10,13 @@ from sensor_msgs.msg import Joy
 # import time
 
 
+def get_sign(val):
+    if val >= 0:
+        return 01
+    else:
+        return 0
+
+
 class AlumSerialInterface:
 
     def __init__(self, port="/dev/ttyUSB0", BaudRate=9600):
@@ -26,8 +33,8 @@ class AlumSerialInterface:
         data = struct.pack('4B1H2B', 01, 04, 01, 01, 00, 13, 10)
         rospy.loginfo(binascii.b2a_hex(data))
 
-    def send_A1(self, motor_cmd, motor_sign):
-        data = struct.pack('4B1H2B', 01, 04, 01, motor_sign, abs(motor_cmd), 13, 10)
+    def send_A1(self, val):
+        data = struct.pack('4B1H2B', 01, 04, 01, get_sign(val), abs(val), 13, 10)
         rospy.loginfo(binascii.b2a_hex(data))
         try:
             self.serialcon.write(data)
@@ -36,8 +43,8 @@ class AlumSerialInterface:
             print("serial send failed!")
             raise
 
-    def send_A2(self, motor_cmd, motor_sign):
-        data = struct.pack('4B1H2B', 01, 04, 02, motor_sign, abs(motor_cmd), 13, 10)
+    def send_A2(self, val):
+        data = struct.pack('4B1H2B', 01, 04, 02, get_sign(val), abs(val), 13, 10)
         rospy.loginfo(binascii.b2a_hex(data))
         try:
             self.serialcon.write(data)
@@ -46,8 +53,8 @@ class AlumSerialInterface:
             print("serial send failed!")
             raise
 
-    def send_A3(self, motor_cmd, motor_sign):
-        data = struct.pack('4B1H2B', 01, 04, 03, motor_sign, abs(motor_cmd), 13, 10)
+    def send_A3(self, val):
+        data = struct.pack('4B1H2B', 01, 04, 03, get_sign(val), abs(val), 13, 10)
         rospy.loginfo(binascii.b2a_hex(data))
         try:
             self.serialcon.write(data)
@@ -84,6 +91,70 @@ class AlumSerialInterface:
             self.serialcon.close()
         except:
             pass
+
+
+class AlumRosNode:
+
+    def __init__(self):
+        rospy.init_node("serial_send")
+        rospy.on_shutdown(self.shutdown)
+        self.loop = rospy.Rate(20)
+        self.serial = AlumSerialInterface()
+        self.stop_all()
+        rospy.Subscriber('/joy', Joy, self.callback_joystick, queue_size=1)
+
+    def callback_joystick(self, joy):
+        if joy.buttons[0] > 0:
+            self.stop_all()
+            self.a3_step_up()
+            return
+        if joy.buttons[3] > 0:
+            self.stop_all()
+            self.a3_step_down()
+            return
+        self.control_a1(joy.axes[0])
+        self.loop.sleep()
+        self.control_a2(joy.axes[2])
+        self.loop.sleep()
+
+    def a3_step_up(self):
+        cnt = 0
+        while cnt < 5:
+            self.control_a3(0.6)
+            cnt = cnt+1
+            self.loop.sleep()
+        self.control_a3(0)
+        self.loop.sleep()
+        self.control_a3(0)
+        self.control_a3(0)
+
+    def a3_step_down(self):
+        cnt = 0
+        while cnt < 5:
+            self.control_a3(-0.6)
+            cnt = cnt+1
+            self.loop.sleep()
+        self.control_a3(0)
+        self.loop.sleep()
+        self.control_a3(0)
+        self.control_a3(0)
+
+    def control_a1(self, val):
+        self.serial.send_A1(val*800)
+
+    def control_a2(self, val):
+        self.serial.send_A2(val*800)
+
+    def control_a3(self, val):
+        self.serial.send_A3(val*800)
+
+    def stop_all(self):
+        self.control_a1(0)
+        self.control_a2(0)
+        self.control_a3(0)
+
+    def shutdown(self):
+        self.serial.shutdown()
 
 
 class serialport_write():
@@ -212,7 +283,7 @@ class serialport_write():
 
 if __name__ == '__main__':
     try:
-        obj = serialport_write()
+        obj = AlumRosNode()
         rospy.spin()
     except:
         raise
